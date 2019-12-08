@@ -1,4 +1,5 @@
 import numpy as np
+from collections import namedtuple
 
 def sbx_crossover(p1, p2, sbxdi):
   D = p1.shape[0]
@@ -59,8 +60,44 @@ def learn_rmp_dummy(subpops):
   rmp_matrix = np.full([K, K], 0.3)
   return rmp_matrix
 
+class Model:
+  def __init__(self, mean, std, num_sample):
+    self.mean        = mean
+    self.std         = std
+    self.num_sample  = num_sample
+    self.prob_matrix = None
+
+Model = namedtuple('Model', ('mean', 'std', 'num_sample'))
+
 def learn_rmp(subpops, D):
-  K = len(subpops)
+  K          = len(subpops)
   rmp_matrix = np.eye(K)
-  
+
+  # add noise and build probabilistic models
+  models = []
+  for k in range(K):
+    subpop            = subpops[k]
+    num_sample        = len(subpop)
+    num_random_sample = int(np.floor(0.1 * num_sample))
+    rand_pop          = np.random.rand(num_random_sample, D)
+    mean              = np.mean(np.concatenate([subpop, rand_pop]), axis=0)
+    std               = np.std(np.concatenate([subpop, rand_pop]), axis=0)
+    models.append(Model(mean, std, num_sample))
+
+  for i in range(K-1):
+    for j in range(i + 1, K)
+
   return rmp_matrix
+
+def main():
+  N = 30
+  D = 50
+
+  subpops = []
+  for i in range(3):
+    subpops.append(np.random.rand(N, D))
+
+  learn_rmp(subpops, D)
+
+if __name__ == '__main__':
+  main()
