@@ -62,7 +62,7 @@ def mfeaii(functions):
         c1, c2 = sbx_crossover(p1, p2, sbxdi)
         c1 = mutate(c1, pmdi)
         c2 = mutate(c2, pmdi)
-        c1, c2 = variable_swap(c1, c2, pswap)
+        # c1, c2 = variable_swap(c1, c2, pswap)
         if np.random.rand() < 0.5: skill_factor[N + i] = sf1
         else: skill_factor[N + i] = sf2
         if np.random.rand() < 0.5: skill_factor[N + i + 1] = sf1
@@ -94,14 +94,6 @@ def mfeaii(functions):
     c1 = population[np.where(skill_factor == 0)][0]
     c2 = population[np.where(skill_factor == 1)][0]
 
-    desc = 'gen:{} fitness:{} learned_rmp:{}'.format(t, ' '.join('{:0.2f}'.format(_) for _ in best_fitness), '%0.2f' % rmp_matrix[0, 1])
+    desc = 'gen:{} fitness:{} learned_rmp:{}'.format(t, ' '.join('{:0.6f}'.format(_) for _ in best_fitness), '%0.2f' % rmp_matrix[0, 1])
     iterator.set_description(desc)
 
-def main():
-  functions = CI_HS().functions
-  for exp_id in range(config['repeat']):
-    print('[+] MFEA - CI_HS - %d/%d' % (exp_id, config['repeat']))
-    mfeaii(functions)
-
-if __name__ == '__main__':
-  main()

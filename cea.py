@@ -72,14 +72,6 @@ def cea(functions):
     c1 = population[np.where(skill_factor == 0)][0]
     c2 = population[np.where(skill_factor == 1)][0]
 
-    desc = 'gen:{} fitness:{}'.format(t, ' '.join('{:0.2f}'.format(_) for _ in best_fitness))
+    desc = 'gen:{} fitness:{}'.format(t, ' '.join('{:0.6f}'.format(_) for _ in best_fitness))
     iterator.set_description(desc)
 
-def main():
-  functions = CI_HS().functions
-  for exp_id in range(config['repeat']):
-    print('[+] CEA - CI_HS - %d/%d' % (exp_id, config['repeat']))
-    cea(functions)
-
-if __name__ == '__main__':
-  main()

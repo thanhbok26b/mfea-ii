@@ -56,11 +56,6 @@ def get_subpops(population, skill_factor):
     subpops.append(population[idx, :])
   return subpops
 
-def learn_rmp_dummy(subpops):
-  K = len(subpops)
-  rmp_matrix = np.full([K, K], 0.3)
-  return rmp_matrix
-
 class Model:
   def __init__(self, mean, std, num_sample):
     self.mean        = mean
@@ -106,22 +101,10 @@ def learn_rmp(subpops, D):
       probmatrix[1][:, 1] = models[j].density(subpops[j])
 
       rmp = fminbound(lambda rmp: log_likelihood(rmp, probmatrix, K), 0, 1)
-      rmp = rmp + np.random.randn() * 0.01
+      print(rmp)
+      rmp += np.random.randn() * 0.01
       rmp = np.clip(rmp, 0, 1)
       rmp_matrix[k, j] = rmp
       rmp_matrix[j, k] = rmp
 
   return rmp_matrix
-
-def main():
-  N = 30
-  D = 50
-
-  subpops = []
-  for i in range(3):
-    subpops.append(np.random.rand(N, D))
-
-  learn_rmp(subpops, D)
-
-if __name__ == '__main__':
-  main()
