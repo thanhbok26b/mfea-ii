@@ -2,7 +2,7 @@ from mtsoo import *
 
 config = load_config()
 
-def mfea(functions):
+def mfeaii(functions):
   # unpacking hyper-parameters
   K = len(functions)
   N = config['pop_size'] * K
@@ -43,7 +43,7 @@ def mfea(functions):
 
     # learn rmp
     subpops    = get_subpops(population, skill_factor)
-    rmp_matrix = learn_rmp_dummy(subpops)
+    rmp_matrix = learn_rmp(subpops, D)
 
     # select pair to crossover
     for i in range(0, N, 2):
@@ -94,14 +94,14 @@ def mfea(functions):
     c1 = population[np.where(skill_factor == 0)][0]
     c2 = population[np.where(skill_factor == 1)][0]
 
-    desc = 'gen:{} fitness:{}'.format(t, ' '.join('{:0.2f}'.format(_) for _ in best_fitness))
+    desc = 'gen:{} fitness:{} learned_rmp:{}'.format(t, ' '.join('{:0.2f}'.format(_) for _ in best_fitness), '%0.2f' % rmp_matrix[0, 1])
     iterator.set_description(desc)
 
 def main():
   functions = CI_HS().functions
   for exp_id in range(config['repeat']):
     print('[+] MFEA - CI_HS - %d/%d' % (exp_id, config['repeat']))
-    mfea(functions)
+    mfeaii(functions)
 
 if __name__ == '__main__':
   main()

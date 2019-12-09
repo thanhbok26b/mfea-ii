@@ -1,5 +1,6 @@
 import numpy as np
-from collections import namedtuple
+from scipy.optimize import fminbound
+from scipy.stats import multivariate_normal
 
 def sbx_crossover(p1, p2, sbxdi):
   D = p1.shape[0]
@@ -51,7 +52,7 @@ def get_subpops(population, skill_factor):
   K = len(set(skill_factor))
   subpops = []
   for k in range(K):
-    idx = np.where(skill_factor == k)
+    idx = np.where(skill_factor == k)[0]
     subpops.append(population[idx, :])
   return subpops
 
@@ -65,9 +66,20 @@ class Model:
     self.mean        = mean
     self.std         = std
     self.num_sample  = num_sample
-    self.prob_matrix = None
 
-Model = namedtuple('Model', ('mean', 'std', 'num_sample'))
+  def density(self, subpop):
+    return multivariate_normal.pdf(subpop, mean=self.mean, cov=self.std)
+
+def log_likelihood(rmp, probmatrix, K):
+  f = 0
+  for k in range(2):
+    for j in range(2):
+      if k == j:
+        probmatrix[k][:, j] = probmatrix[k][:, j] * (1 - (0.5 * (K - 1) * rmp / K))
+      else:
+        probmatrix[k][:, j] = probmatrix[k][:, j] * 0.5  * (K - 1) * rmp / K
+    f += np.sum(-np.log(np.sum(probmatrix[k], axis=1)))
+  return f
 
 def learn_rmp(subpops, D):
   K          = len(subpops)
@@ -84,8 +96,20 @@ def learn_rmp(subpops, D):
     std               = np.std(np.concatenate([subpop, rand_pop]), axis=0)
     models.append(Model(mean, std, num_sample))
 
-  for i in range(K-1):
-    for j in range(i + 1, K)
+  for k in range(K - 1):
+    for j in range(k + 1, K):
+      probmatrix = [np.ones([models[k].num_sample, 2]), 
+                    np.ones([models[j].num_sample, 2])]
+      probmatrix[0][:, 0] = models[k].density(subpops[k])
+      probmatrix[0][:, 1] = models[j].density(subpops[k])
+      probmatrix[1][:, 0] = models[k].density(subpops[j])
+      probmatrix[1][:, 1] = models[j].density(subpops[j])
+
+      rmp = fminbound(lambda rmp: log_likelihood(rmp, probmatrix, K), 0, 1)
+      rmp = rmp + np.random.randn() * 0.01
+      rmp = np.clip(rmp, 0, 1)
+      rmp_matrix[k, j] = rmp
+      rmp_matrix[j, k] = rmp
 
   return rmp_matrix
 
