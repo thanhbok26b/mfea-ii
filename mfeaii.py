@@ -2,7 +2,7 @@ from mtsoo import *
 
 config = load_config()
 
-def mfeaii(functions):
+def mfeaii(functions, callback=None):
   # unpacking hyper-parameters
   K = len(functions)
   N = config['pop_size'] * K
@@ -97,3 +97,5 @@ def mfeaii(functions):
     desc = 'gen:{} fitness:{} learned_rmp:{}'.format(t, ' '.join('{:0.6f}'.format(_) for _ in best_fitness), '%0.2f' % rmp_matrix[0, 1])
     iterator.set_description(desc)
 
+    if callback:
+      callback(population, skill_factor)

@@ -3,15 +3,22 @@ from cea import cea
 from mfea import mfea
 from mfeaii import mfeaii
 
-config = load_config()
-functions = NI_HS().functions
+def callback(population, skill_factor):
+  # np.save('data/population.npy', population)
+  # np.save('data/skill_factor', skill_factor)
+  pass
 
-for exp_id in range(config['repeat']):
-  # print('[+] EA - %d/%d' % (exp_id, config['repeat']))
-  # cea(functions)
+def main():
+  config = load_config()
+  functions = NI_MS().functions
 
-  # print('[+] MFEA - %d/%d' % (exp_id, config['repeat']))
-  # mfea(functions)
+  for exp_id in range(config['repeat']):
+    # print('[+] EA - %d/%d' % (exp_id, config['repeat']))
+    # cea(functions)
+    # print('[+] MFEA - %d/%d' % (exp_id, config['repeat']))
+    # mfea(functions)
+    print('[+] MFEAII - %d/%d' % (exp_id, config['repeat']))
+    mfeaii(functions, callback)
 
-  print('[+] MFEAII - %d/%d' % (exp_id, config['repeat']))
-  mfeaii(functions)
+if __name__ == '__main__':
+  main()

@@ -2,7 +2,7 @@ from mtsoo import *
 
 config = load_config()
 
-def cea(functions):
+def cea(functions, callback=None):
   # unpacking hyper-parameters
   K = len(functions)
   N = config['pop_size'] * K
@@ -75,3 +75,5 @@ def cea(functions):
     desc = 'gen:{} fitness:{}'.format(t, ' '.join('{:0.6f}'.format(_) for _ in best_fitness))
     iterator.set_description(desc)
 
+    if callback:
+      callback(population, skill_factor)

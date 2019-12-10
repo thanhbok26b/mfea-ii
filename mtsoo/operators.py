@@ -68,7 +68,7 @@ class Model:
 def log_likelihood(rmp, probmatrix, K):
   f = 0
   for k in range(2):
-    for j in range(2):
+    for j in range(k+1, 2):
       if k == j:
         probmatrix[k][:, j] = probmatrix[k][:, j] * (1 - (0.5 * (K - 1) * rmp / K))
       else:
@@ -101,7 +101,6 @@ def learn_rmp(subpops, D):
       probmatrix[1][:, 1] = models[j].density(subpops[j])
 
       rmp = fminbound(lambda rmp: log_likelihood(rmp, probmatrix, K), 0, 1)
-      print(rmp)
       rmp += np.random.randn() * 0.01
       rmp = np.clip(rmp, 0, 1)
       rmp_matrix[k, j] = rmp
