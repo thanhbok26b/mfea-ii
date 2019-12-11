@@ -98,4 +98,4 @@ def mfeaii(functions, callback=None):
     iterator.set_description(desc)
 
     if callback:
-      callback(population, skill_factor)
+      callback(t, population, skill_factor)

@@ -48,11 +48,11 @@ def find_relative(population, skill_factor, sf, N):
 def calculate_scalar_fitness(factorial_cost):
   return 1 / np.min(np.argsort(np.argsort(factorial_cost, axis=0), axis=0) + 1, axis=1)
 
-def get_subpops(population, skill_factor):
+def get_subpops(population, N, skill_factor):
   K = len(set(skill_factor))
   subpops = []
   for k in range(K):
-    idx = np.where(skill_factor == k)[0]
+    idx = np.where(skill_factor == k)[0][:N]
     subpops.append(population[idx, :])
   return subpops
 
@@ -68,19 +68,17 @@ class Model:
 def log_likelihood(rmp, probmatrix, K):
   f = 0
   for k in range(2):
-    for j in range(k+1, 2):
+    for j in range(2):
       if k == j:
-        probmatrix[k][:, j] = probmatrix[k][:, j] * (1 - (0.5 * (K - 1) * rmp / K))
+        probmatrix[k][:, j] = probmatrix[k][:, j] * (1 - 0.5 * (K - 1) * rmp / K)
       else:
         probmatrix[k][:, j] = probmatrix[k][:, j] * 0.5  * (K - 1) * rmp / K
     f += np.sum(-np.log(np.sum(probmatrix[k], axis=1)))
   return f
 
-def learn_rmp(subpops, D):
-  K          = len(subpops)
-  rmp_matrix = np.eye(K)
-
-  # add noise and build probabilistic models
+def learn_models(subpops):
+  K = len(subpops)
+  D = subpops[0].shape[1]
   models = []
   for k in range(K):
     subpop            = subpops[k]
@@ -90,6 +88,16 @@ def learn_rmp(subpops, D):
     mean              = np.mean(np.concatenate([subpop, rand_pop]), axis=0)
     std               = np.std(np.concatenate([subpop, rand_pop]), axis=0)
     models.append(Model(mean, std, num_sample))
+  return models
+
+def _get_prob_matrix(subpops, models):
+  pass
+
+def learn_rmp(subpops, D):
+  K          = len(subpops)
+  rmp_matrix = np.eye(K)
+
+  models = _learn_models(subpops)
 
   for k in range(K - 1):
     for j in range(k + 1, K):
