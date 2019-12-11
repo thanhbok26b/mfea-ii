@@ -2,11 +2,7 @@
 
 This repository implement MFEA-II [MFEA-II Official Matlab Version](http://www.bdsc.site/websites/MTO/MFEA2.zip). Tested on MTSOO benchmark. This repo could be used as a template or starter code for conducting multitasking optimization on other specific problems.
 
-## Getting Started
-
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
-
-### Prerequisites
+## Prerequisites
 
 This is a pure Numpy/Scipy implementation. Install necessary library using
 
