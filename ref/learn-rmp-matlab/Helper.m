@@ -15,7 +15,7 @@ classdef Helper
       K = length(subpops);
       for k = 1:K
         models(k).num_sample = length(subpops(k).data);
-        num_random_sample    = floor(0.2 * models(k).num_sample);
+        num_random_sample    = floor(0.1 * models(k).num_sample);
         random_pop           = rand(num_random_sample, D);
         models(k).mean       = mean([subpops(k).data; random_pop]); 
         models(k).stdev      = std([subpops(k).data; random_pop]); 
