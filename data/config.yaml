@@ -1,5 +1,5 @@
 repeat: 1
-pop_size: 50
+pop_size: 500
 num_iter: 1000
 sbxdi: 10
 pmdi: 10
