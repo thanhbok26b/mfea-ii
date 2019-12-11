@@ -1,8 +1,6 @@
 from mtsoo import *
 
-config = load_config()
-
-def mfeaii(functions, callback=None):
+def mfeaii(functions, config, callback=None):
   # unpacking hyper-parameters
   K = len(functions)
   N = config['pop_size'] * K
@@ -42,7 +40,7 @@ def mfeaii(functions, callback=None):
     factorial_cost[N:] = np.inf
 
     # learn rmp
-    subpops    = get_subpops(population, skill_factor)
+    subpops    = get_subpops(population, skill_factor, N)
     rmp_matrix = learn_rmp(subpops, D)
 
     # select pair to crossover
@@ -93,9 +91,13 @@ def mfeaii(functions, callback=None):
     best_fitness = np.min(factorial_cost, axis=0)
     c1 = population[np.where(skill_factor == 0)][0]
     c2 = population[np.where(skill_factor == 1)][0]
+    scalar_fitness = scalar_fitness[sort_index]
 
-    desc = 'gen:{} fitness:{} learned_rmp:{}'.format(t, ' '.join('{:0.6f}'.format(_) for _ in best_fitness), '%0.2f' % rmp_matrix[0, 1])
-    iterator.set_description(desc)
-
+    # optimization info
+    message = {'algorithm': 'mfeaii', 'rmp':round(rmp_matrix[0, 1], 1)}
+    results = get_optimization_results(t, population, factorial_cost, scalar_fitness, skill_factor, message)
     if callback:
-      callback(t, population, skill_factor)
+      callback(results)
+
+    desc = 'gen:{} fitness:{} message:{}'.format(t, ' '.join('{:0.6f}'.format(res.fun) for res in results), message)
+    iterator.set_description(desc)

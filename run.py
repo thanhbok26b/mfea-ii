@@ -4,9 +4,8 @@ from mfea import mfea
 from mfeaii import mfeaii
 from scipy.io import savemat
 
-def callback(t, population, skill_factor):
-  if t % 100 == 0:
-    savemat('data/dump/%d.mat' % t, {'population':population, 'skill_factor':skill_factor})
+def callback(res):
+  pass
 
 def main():
   config = load_config()
@@ -14,11 +13,11 @@ def main():
 
   for exp_id in range(config['repeat']):
     print('[+] EA - %d/%d' % (exp_id, config['repeat']))
-    cea(functions, callback)
-    # print('[+] MFEA - %d/%d' % (exp_id, config['repeat']))
-    # mfea(functions, callback)
-    # print('[+] MFEAII - %d/%d' % (exp_id, config['repeat']))
-    # mfeaii(functions, callback)
+    cea(functions, config, callback)
+    print('[+] MFEA - %d/%d' % (exp_id, config['repeat']))
+    mfea(functions, config, callback)
+    print('[+] MFEAII - %d/%d' % (exp_id, config['repeat']))
+    mfeaii(functions, config, callback)
 
 if __name__ == '__main__':
   main()

@@ -2,7 +2,7 @@ from mtsoo import *
 
 config = load_config()
 
-def mfea(functions, callback=None):
+def mfea(functions, config, callback=None):
   # unpacking hyper-parameters
   K = len(functions)
   N = config['pop_size'] * K
@@ -85,13 +85,16 @@ def mfea(functions, callback=None):
     population = population[sort_index]
     skill_factor = skill_factor[sort_index]
     factorial_cost = factorial_cost[sort_index]
+    scalar_fitness = scalar_fitness[sort_index]
 
-    best_fitness = np.min(factorial_cost, axis=0)
     c1 = population[np.where(skill_factor == 0)][0]
     c2 = population[np.where(skill_factor == 1)][0]
 
-    desc = 'gen:{} fitness:{}'.format(t, ' '.join('{:0.6f}'.format(_) for _ in best_fitness))
-    iterator.set_description(desc)
-
+    # optimization info
+    message = {'algorithm': 'mfea', 'rmp':rmp}
+    results = get_optimization_results(t, population, factorial_cost, scalar_fitness, skill_factor, message)
     if callback:
-      callback(t, population, skill_factor)
+      callback(results)
+
+    desc = 'gen:{} fitness:{} message:{}'.format(t, ' '.join('{:0.6f}'.format(res.fun) for res in results), message)
+    iterator.set_description(desc)

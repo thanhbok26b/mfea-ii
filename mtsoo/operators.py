@@ -1,7 +1,9 @@
 import numpy as np
+from copy import deepcopy
 from scipy.stats import norm
 from scipy.optimize import fminbound
 
+# EVOLUTIONARY OPERATORS
 def sbx_crossover(p1, p2, sbxdi):
   D = p1.shape[0]
   cf = np.empty([D])
@@ -42,13 +44,15 @@ def variable_swap(p1, p2, probswap):
   c2[np.where(swap_indicator)] = p1[np.where(swap_indicator)]
   return c1, c2
 
+# MULTIFACTORIAL EVOLUTIONARY HELPER FUNCTIONS
 def find_relative(population, skill_factor, sf, N):
   return population[np.random.choice(np.where(skill_factor[:N] == sf)[0])]
 
 def calculate_scalar_fitness(factorial_cost):
   return 1 / np.min(np.argsort(np.argsort(factorial_cost, axis=0), axis=0) + 1, axis=1)
 
-def get_subpops(population, N, skill_factor):
+# MULTIFACTORIAL EVOLUTIONARY WITH TRANSFER PARAMETER ESTIMATION HELPER FUNCTIONS
+def get_subpops(population, skill_factor, N):
   K = len(set(skill_factor))
   subpops = []
   for k in range(K):
@@ -69,16 +73,17 @@ class Model:
       prob *= norm.pdf(subpop[:, d], loc=self.mean[d], scale=self.std[d])
     return prob
 
-def log_likelihood(rmp, probmatrix, K):
-  f = 0
+def log_likelihood(rmp, prob_matrix, K):
+  posterior_matrix = deepcopy(prob_matrix)
+  value = 0
   for k in range(2):
     for j in range(2):
       if k == j:
-        probmatrix[k][:, j] = probmatrix[k][:, j] * (1 - 0.5 * (K - 1) * rmp / K)
+        posterior_matrix[k][:, j] = posterior_matrix[k][:, j] * (1 - 0.5 * (K - 1) * rmp / float(K))
       else:
-        probmatrix[k][:, j] = probmatrix[k][:, j] * 0.5 * (K - 1) * rmp / K
-    f += np.sum(-np.log(np.sum(probmatrix[k], axis=1)))
-  return f
+        posterior_matrix[k][:, j] = posterior_matrix[k][:, j] * 0.5 * (K - 1) * rmp / float(K)
+    value = value + np.sum(-np.log(np.sum(posterior_matrix[k], axis=1)))
+  return value
 
 def learn_models(subpops):
   K = len(subpops)
@@ -91,19 +96,13 @@ def learn_models(subpops):
     rand_pop          = np.random.rand(num_random_sample, D)
     mean              = np.mean(np.concatenate([subpop, rand_pop]), axis=0)
     std               = np.std(np.concatenate([subpop, rand_pop]), axis=0)
-    # mean              = np.mean(subpop, axis=0)
-    # std               = np.std(subpop, axis=0)
     models.append(Model(mean, std, num_sample))
   return models
-
-def _get_prob_matrix(subpops, models):
-  pass
 
 def learn_rmp(subpops, D):
   K          = len(subpops)
   rmp_matrix = np.eye(K)
-
-  models = _learn_models(subpops)
+  models = learn_models(subpops)
 
   for k in range(K - 1):
     for j in range(k + 1, K):
@@ -121,3 +120,17 @@ def learn_rmp(subpops, D):
       rmp_matrix[j, k] = rmp
 
   return rmp_matrix
+
+# OPTIMIZATION RESULT HELPERS
+def get_best_individual(population, factorial_cost, scalar_fitness, skill_factor, sf):
+  # select individuals from task sf
+  idx                = np.where(skill_factor == sf)[0]
+  subpop             = population[idx]
+  sub_factorial_cost = factorial_cost[idx]
+  sub_scalar_fitness = scalar_fitness[idx]
+
+  # select best individual
+  idx = np.argmax(sub_scalar_fitness)
+  x = subpop[idx]
+  fun = sub_factorial_cost[idx, sf]
+  return x, fun

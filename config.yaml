@@ -1,6 +1,6 @@
 repeat: 1
-pop_size: 500
-num_iter: 1000
+pop_size: 50
+num_iter: 5000
 sbxdi: 10
 pmdi: 10
 pswap: 0.5
