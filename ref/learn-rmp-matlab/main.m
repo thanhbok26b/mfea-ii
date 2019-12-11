@@ -11,6 +11,8 @@ models  = helper.get_models(subpops, D);
 
 prob_matrix = helper.get_prob_matrix(subpops, models, D);
 
+prob_matrix(1).data
+
 x = [];
 y = [];
 

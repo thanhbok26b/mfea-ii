@@ -1,6 +1,7 @@
 from mtsoo import *
 import matplotlib.pyplot as plt
 from scipy.io import loadmat
+
 D = 50
 K = 2
 N = 50
@@ -23,10 +24,12 @@ probmatrix[0][:, 1] = models[j].density(subpops[k])
 probmatrix[1][:, 0] = models[k].density(subpops[j])
 probmatrix[1][:, 1] = models[j].density(subpops[j])
 
+print(probmatrix[0])
+
 x = []
 y = []
 
-for i in range(1000):
+for i in range(1, 1000):
   x.append(0.001 * i)
   y.append(log_likelihood(0.001 * i, probmatrix, K))
 

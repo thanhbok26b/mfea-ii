@@ -19,6 +19,8 @@ classdef Helper
         random_pop           = rand(num_random_sample, D);
         models(k).mean       = mean([subpops(k).data; random_pop]); 
         models(k).stdev      = std([subpops(k).data; random_pop]); 
+        % models(k).mean       = mean(subpops(k).data); 
+        % models(k).stdev      = std(subpops(k).data); 
       end
     end
 
@@ -51,9 +53,9 @@ classdef Helper
       for k = 1:2
         for j = 1:2
           if k == j
-            prob_matrix(k).data(:, j) = prob_matrix(k).data(:, j) * (1 - 0.5 * (K-1) * rmp / K);
+            prob_matrix(k).data(:, j) = prob_matrix(k).data(:, j) * (1 - 0.5 * (K - 1) * rmp / K);
           else
-            prob_matrix(k).data(:, j) = prob_matrix(k).data(:, j) * 0.5 * (K-1) * rmp / K;
+            prob_matrix(k).data(:, j) = prob_matrix(k).data(:, j) * 0.5 * (K - 1) * rmp / K;
           end
         end
         value = value + sum(-log(sum(prob_matrix(k).data, 2)));

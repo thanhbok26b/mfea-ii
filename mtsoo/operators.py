@@ -1,6 +1,6 @@
 import numpy as np
+from scipy.stats import norm
 from scipy.optimize import fminbound
-from scipy.stats import multivariate_normal
 
 def sbx_crossover(p1, p2, sbxdi):
   D = p1.shape[0]
@@ -63,7 +63,11 @@ class Model:
     self.num_sample  = num_sample
 
   def density(self, subpop):
-    return multivariate_normal.pdf(subpop, mean=self.mean, cov=self.std)
+    N, D = subpop.shape
+    prob = np.ones([N])
+    for d in range(D):
+      prob *= norm.pdf(subpop[:, d], loc=self.mean[d], scale=self.std[d])
+    return prob
 
 def log_likelihood(rmp, probmatrix, K):
   f = 0
@@ -72,7 +76,7 @@ def log_likelihood(rmp, probmatrix, K):
       if k == j:
         probmatrix[k][:, j] = probmatrix[k][:, j] * (1 - 0.5 * (K - 1) * rmp / K)
       else:
-        probmatrix[k][:, j] = probmatrix[k][:, j] * 0.5  * (K - 1) * rmp / K
+        probmatrix[k][:, j] = probmatrix[k][:, j] * 0.5 * (K - 1) * rmp / K
     f += np.sum(-np.log(np.sum(probmatrix[k], axis=1)))
   return f
 
@@ -83,10 +87,12 @@ def learn_models(subpops):
   for k in range(K):
     subpop            = subpops[k]
     num_sample        = len(subpop)
-    num_random_sample = int(np.floor(0.2 * num_sample))
+    num_random_sample = int(np.floor(0.1 * num_sample))
     rand_pop          = np.random.rand(num_random_sample, D)
     mean              = np.mean(np.concatenate([subpop, rand_pop]), axis=0)
     std               = np.std(np.concatenate([subpop, rand_pop]), axis=0)
+    # mean              = np.mean(subpop, axis=0)
+    # std               = np.std(subpop, axis=0)
     models.append(Model(mean, std, num_sample))
   return models
 
