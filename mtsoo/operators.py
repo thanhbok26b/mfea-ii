@@ -83,7 +83,7 @@ def learn_models(subpops):
   for k in range(K):
     subpop            = subpops[k]
     num_sample        = len(subpop)
-    num_random_sample = int(np.floor(0.1 * num_sample))
+    num_random_sample = int(np.floor(0.2 * num_sample))
     rand_pop          = np.random.rand(num_random_sample, D)
     mean              = np.mean(np.concatenate([subpop, rand_pop]), axis=0)
     std               = np.std(np.concatenate([subpop, rand_pop]), axis=0)

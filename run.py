@@ -2,11 +2,11 @@ from mtsoo import *
 from cea import cea
 from mfea import mfea
 from mfeaii import mfeaii
+from scipy.io import savemat
 
 def callback(t, population, skill_factor):
   if t % 100 == 0:
-    np.save('data/dump/population_%d.npy' % t, population)
-    np.save('data/dump/skill_factor_%d.npy' % t, skill_factor)
+    savemat('data/dump/%d.mat' % t, {'population':population, 'skill_factor':skill_factor})
 
 def main():
   config = load_config()
