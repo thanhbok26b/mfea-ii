@@ -56,7 +56,7 @@ def get_subpops(population, skill_factor, N):
   K = len(set(skill_factor))
   subpops = []
   for k in range(K):
-    idx = np.where(skill_factor == k)[0][:N]
+    idx = np.where(skill_factor == k)[0][:N//K]
     subpops.append(population[idx, :])
   return subpops
 
